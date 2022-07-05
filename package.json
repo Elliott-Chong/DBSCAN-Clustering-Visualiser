@@ -1,0 +1,22 @@
+{
+  "name": "dbscan-clustering-visualiser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Elliott-Chong/DBSCAN-Clustering-Visualiser.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Elliott-Chong/DBSCAN-Clustering-Visualiser/issues"
+  },
+  "homepage": "https://github.com/Elliott-Chong/DBSCAN-Clustering-Visualiser#readme",
+  "dependencies": {
+    "density-clustering": "^1.3.0"
+  }
+}
