@@ -10,16 +10,45 @@
     <script src="./sketch.js" defer></script>
     <script src="./Point.js" defer></script>
   </head>
-  <body>
+  <body onload="localStorage.clear()">
     <div id="canvas"></div>
     <input type="file" accept=".csv,image/*" id="fileUpload" />
     <p id="test"></p>
-    <input type="text" id="text-box" size="20" value="Hello world!" />
-    <button onclick="selectText()">Select text</button>
-    <div id="svgContainer">
-      <svg width="100%" viewBox="0 0 960 500">
+    <!-- <input type="text" id="text-box" size="20" value="Hello world!" />
+    <button onclick="selectText()">Select text</button> -->
+    <div id="svgContainer" style="width: 75%">
+      <svg width="100%" viewBox="0 0 960 500" preserveAspectRatio="none">
         <rect x="0" y="0" width="100%" height="100%" style="fill: pink"></rect>
+        <g id="scatterPoints" transform="translate(50,50) scale(0.95)">
+          <g opacity="0.5" id="clusterRegion"></g>
+        </g>
       </svg>
+    </div>
+
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+      "
+    >
+      <button onclick="startDBSCAN()">START</button>
+      <div style="display: flex; justify-content: center; align-items: center">
+        <label for="epsilon">epsilon</label>
+        <input
+          type="range"
+          id="epsilon"
+          step="0.02"
+          min="0.1"
+          max="1.98"
+          value="1"
+        />
+      </div>
+      <div style="display: flex; justify-content: center; align-items: center">
+        <label for="minPoint">minPoints</label>
+        <input type="range" id="minPoint" step="1" min="1" max="5" value="3" />
+      </div>
     </div>
   </body>
 </html>
