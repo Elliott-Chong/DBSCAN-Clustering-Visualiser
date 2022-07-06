@@ -62,6 +62,9 @@ function draw() {
     points[i].show();
   }
 }
+
+const sleep = async (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const distFunc = (point, other_point) => {
   return distance_cache.get(point.serialised).get(other_point.serialised);
 };
@@ -70,7 +73,7 @@ const arrRemove = (arr, elt) => {
   arr = arr.filter((gay) => gay.serialised != elt.serialised);
 };
 
-const DBSCAN = (points, distFunc, epsilon, minPts) => {
+const DBSCAN = async (points, distFunc, epsilon, minPts) => {
   let cluster_counter = 0;
   for (let point of points) {
     if (label.has(point.serialised)) continue;
@@ -80,7 +83,7 @@ const DBSCAN = (points, distFunc, epsilon, minPts) => {
       continue;
     }
     cluster_counter++;
-    label.set(point.serialsed, cluster_counter);
+    label.set(point.serialised, cluster_counter);
     for (let neighbour of neighbours) {
       if (label.get(neighbour.serialised) == "noise") {
         label.set(neighbour.serialised, cluster_counter);
