@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DBSCAN Clustering Visualizer</title>
-    <script src="./test.js" defer></script>
+    <script src="./main.js" defer></script>
     <script src="./p5.min.js" defer></script>
     <script src="./sketch.js" defer></script>
     <script src="./Point.js" defer></script>
@@ -16,5 +16,10 @@
     <p id="test"></p>
     <input type="text" id="text-box" size="20" value="Hello world!" />
     <button onclick="selectText()">Select text</button>
+    <div id="svgContainer">
+      <svg width="100%" viewBox="0 0 960 500">
+        <rect x="0" y="0" width="100%" height="100%" style="fill: pink"></rect>
+      </svg>
+    </div>
   </body>
 </html>
