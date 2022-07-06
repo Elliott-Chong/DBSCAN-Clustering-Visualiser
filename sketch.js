@@ -1,10 +1,20 @@
 let x_range = 800;
 let y_range = 800;
+let label = new Map();
+
+let label_colors;
 
 let points = [];
 let distance_cache = new Map();
 
 function setup() {
+  label_colors = {
+    1: color(255, 0, 0),
+    2: color(0, 255, 0),
+    3: color(0, 0, 255),
+    4: color(100, 0, 10),
+    5: color(50, 30, 100),
+  };
   createCanvas(window.innerHeight * 0.95, window.innerHeight * 0.95).parent(
     select("#canvas")
   );
@@ -23,6 +33,7 @@ function setup() {
             .set(other_point.serialised, distance);
         }
       }
+      DBSCAN(points, distFunc, 20, 4);
     });
   });
   frameRate(60);
@@ -54,18 +65,12 @@ function draw() {
 const distFunc = (point, other_point) => {
   return distance_cache.get(point.serialised).get(other_point.serialised);
 };
-// const serialise = (point) => {
-//   return point.x.toString() + "-" + point.y.toString();
-// };
-// const deserialise = (str) => {
-//   let res = { x: null, y: null };
-//   let s = str.split("-");
-//   res.x = parseFloat(s[0]);
-//   res.y = parseFloat(s[1]);
-//   return res;
-// };
+
+const arrRemove = (arr, elt) => {
+  arr = arr.filter((gay) => gay.serialised != elt.serialised);
+};
+
 const DBSCAN = (points, distFunc, epsilon, minPts) => {
-  let label = new Map();
   let cluster_counter = 0;
   for (let point of points) {
     if (label.has(point.serialised)) continue;
@@ -75,12 +80,19 @@ const DBSCAN = (points, distFunc, epsilon, minPts) => {
       continue;
     }
     cluster_counter++;
-    label.set(point.serialsed, cluster_counter.toString());
-    while (neighbours.length != 0) {
-      for (let neighbour of neighbours) {
-        if (label.get(neighbour.serialised) == "noise") {
-          label.set(neighbour.serialised, cluster_counter);
-        } else if (label.get(neighbour.serialised)) {
+    label.set(point.serialsed, cluster_counter);
+    for (let neighbour of neighbours) {
+      if (label.get(neighbour.serialised) == "noise") {
+        label.set(neighbour.serialised, cluster_counter);
+      }
+      if (label.has(neighbour.serialised)) {
+        continue;
+      }
+      label.set(neighbour.serialised, cluster_counter);
+      let neighbour_neighbours = neighbour.getNeighbours(distFunc, epsilon);
+      if (neighbour_neighbours.length >= minPts) {
+        for (let i of neighbour_neighbours) {
+          neighbours.push(i);
         }
       }
     }

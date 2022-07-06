@@ -9,7 +9,13 @@ class Point {
 
   show() {
     push();
-    fill(255);
+    noStroke();
+    let l = label.get(this.serialised);
+    if (l == "noise") {
+      fill(0, 255, 0);
+    } else {
+      fill(label_colors[l]);
+    }
     ellipse(this.screen_x, this.screen_y, 6);
     pop();
   }
