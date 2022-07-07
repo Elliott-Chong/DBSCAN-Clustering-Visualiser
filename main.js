@@ -1,3 +1,16 @@
+function onload() {
+  localStorage.clear();
+  sliderChange();
+}
+
+function sliderChange() {
+  document.getElementById("epsilonValue").innerHTML = Number(
+    document.getElementById("epsilon").value
+  ).toFixed(2);
+  document.getElementById("minPointValue").innerHTML =
+    document.getElementById("minPoint").value;
+}
+
 document.getElementById("fileUpload").addEventListener("change", async (e) => {
   document.getElementById(
     "scatterPoints"
@@ -75,16 +88,38 @@ function getRandom(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
+function distance(p1, p2) {
+  return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+}
+
 function startDBSCAN() {
   if (document.getElementById("scatterPoints").children.length <= 1) {
     alert("no data points found");
     return;
   }
+  var eps = document.getElementById("epsilon").value;
+  var minPoint = document.getElementById("minPoint").value;
   // console.log(JSON.parse(localStorage.getItem("dataset")));
   var dataset = JSON.parse(localStorage.getItem("dataset"));
   var dotList = [
     ...document.getElementById("scatterPoints").getElementsByClassName("dot"),
   ];
+  var region = [];
+  for (var p1 of dotList) {
+    var result = [];
+    for (var p2 of dotList.reverse()) {
+      if (
+        distance(
+          { x: p1.getAttribute("cx"), y: p1.getAttribute("cy") },
+          { x: p2.getAttribute("cx"), y: p2.getAttribute("cy") }
+        ) < eps
+      ) {
+        result.push({ x: p2.getAttribute("cx"), y: p2.getAttribute("cy") });
+      }
+    }
+    region.push(result);
+  }
+  console.log(region);
   var randomPoint = getRandom(dotList);
   console.log(randomPoint.getAttribute("cx"), randomPoint.getAttribute("cy"));
   // for (var i of dotList) {
