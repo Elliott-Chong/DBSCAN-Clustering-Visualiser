@@ -29,7 +29,7 @@ function setup() {
   select("#minPointShow").html(min_points);
   label_colors = {
     1: color(255, 0, 0),
-    2: color(0, 255, 0),
+    2: color(255, 255, 0),
     3: color(0, 0, 255),
     4: color(100, 0, 10),
     5: color(50, 30, 100),
