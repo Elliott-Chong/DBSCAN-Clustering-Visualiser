@@ -108,7 +108,7 @@ function setup() {
   min_points_slider = select("#minPoint");
   min_points_slider.input(() => {
     min_points = min_points_slider.value();
-    select("#minPointShow").html(epsilon);
+    select("#minPointShow").html(min_points);
   });
 
   select("#start-btn").mousePressed(() => {
