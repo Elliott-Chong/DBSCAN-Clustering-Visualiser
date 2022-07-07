@@ -15,9 +15,9 @@ let min_points;
 
 function setup() {
   // set default values for epsilon and min_points
-  epsilon = 1;
-  min_points = 3;
-
+  epsilon = document.getElementById("epsilon").value;
+  min_points = document.getElementById("minPoint").value;
+  
   label_colors = {
     1: color(255, 0, 0),
     2: color(0, 255, 0),
@@ -32,6 +32,7 @@ function setup() {
   createCanvas(window.innerHeight * 0.95, window.innerHeight * 0.95).parent(
     select("#canvas")
   );
+  // remove default csv
   // // fetch csv from server
   // fetch("http://localhost:5000").then((response) => {
   //   response.json().then((data) => {
@@ -114,7 +115,7 @@ function setup() {
 }
 
 function draw() {
-  background(0);
+  background("#fff");
   for (let i = 0; i < points.length; i++) {
     points[i].show();
   }
