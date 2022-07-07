@@ -8,8 +8,8 @@ class Point {
     } else {
       this.screen_x = x;
       this.screen_y = y;
-      this.x = map(this.screen_x, 0, width, 0, x_range);
-      this.y = map(this.screen_y, 0, height, 0, y_range);
+      this.x = map(this.screen_x, 0, width - 10, x_range + 10);
+      this.y = map(this.screen_y, 0, height - 10, y_range + 10);
     }
     this.serialised = this.x.toString() + "-" + this.y.toString();
   }
