@@ -15,8 +15,8 @@ let min_points;
 
 function setup() {
   // set default values for epsilon and min_points
-  epsilon = 20;
-  min_points = 4;
+  epsilon = 1;
+  min_points = 3;
 
   label_colors = {
     1: color(255, 0, 0),
@@ -87,7 +87,7 @@ function setup() {
                   .set(other_point.serialised, distance);
               }
             }
-            DBSCAN(points, distFunc, 20, 4);
+            DBSCAN(points, distFunc, epsilon, min_points);
             return;
           }
           // Check image if it is the same
@@ -102,15 +102,16 @@ function setup() {
   epsilon_slider = select("#epsilon");
   epsilon_slider.input(() => {
     epsilon = epsilon_slider.value();
+    select("#epsilonShow").html(epsilon);
   });
 
   min_points_slider = select("#minPoint");
   min_points_slider.input(() => {
     min_points = min_points_slider.value();
+    select("#minPointShow").html(epsilon);
   });
 
   select("#start-btn").mousePressed(() => {
-    console.log("day");
     DBSCAN(points, distFunc, epsilon, min_points);
   });
 }
@@ -133,6 +134,7 @@ const arrRemove = (arr, elt) => {
 };
 
 const DBSCAN = async (points, distFunc, epsilon, minPts) => {
+  epsilon *= 15;
   label = new Map();
   let cluster_counter = 0;
   for (let point of points) {

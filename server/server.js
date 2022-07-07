@@ -9,7 +9,7 @@ app.use(cors());
 
 app.get("/", (req, res) => {
   // file_path is relative to the root dir of this project, not server
-  const file_path = "./pimpled_smiley.csv";
+  const file_path = "./density_bars.csv";
 
   let points = [];
   fs.createReadStream(file_path)
