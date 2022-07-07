@@ -32,31 +32,28 @@ function setup() {
   createCanvas(window.innerHeight * 0.95, window.innerHeight * 0.95).parent(
     select("#canvas")
   );
-  // fetch csv from server
-  fetch("http://localhost:5000").then((response) => {
-    response.json().then((data) => {
-      for (let point of data) {
-        points.push(new Point(point.x, point.y));
-      }
-      for (let point of points) {
-        distance_cache.set(point.serialised, new Map());
-        for (let other_point of points) {
-          let distance = dist(point.x, point.y, other_point.x, other_point.y);
-          distance_cache
-            .get(point.serialised)
-            .set(other_point.serialised, distance);
-        }
-      }
-      DBSCAN(points, distFunc, epsilon, min_points);
-    });
-  });
+  // // fetch csv from server
+  // fetch("http://localhost:5000").then((response) => {
+  //   response.json().then((data) => {
+  //     for (let point of data) {
+  //       points.push(new Point(point.x, point.y));
+  //     }
+  //     for (let point of points) {
+  //       distance_cache.set(point.serialised, new Map());
+  //       for (let other_point of points) {
+  //         let distance = dist(point.x, point.y, other_point.x, other_point.y);
+  //         distance_cache
+  //           .get(point.serialised)
+  //           .set(other_point.serialised, distance);
+  //       }
+  //     }
+  //     DBSCAN(points, distFunc, epsilon, min_points);
+  //   });
+  // });
   // hongyu stuff
   document
     .getElementById("fileUpload")
     .addEventListener("change", async (e) => {
-      document.getElementById(
-        "scatterPoints"
-      ).innerHTML = `<g opacity="0.5" id="clusterRegion"></g>`;
       if (e.target.files.length < 0) {
         return;
       }
