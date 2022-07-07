@@ -10,7 +10,7 @@
     <script src="./sketch.js" defer></script>
     <script src="./Point.js" defer></script>
   </head>
-  <body onload="localStorage.clear()">
+  <body onload="onload()">
     <div id="canvas"></div>
     <div
       style="
@@ -22,7 +22,17 @@
     >
       <button id="start-btn" onclick="startDBSCAN()">START</button>
       <div style="display: flex; justify-content: center; align-items: center">
-        <label for="epsilon">epsilon</label>
+        <label
+          for="epsilon"
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+          "
+          >epsilon:
+          <div id="epsilonValue"></div
+        ></label>
         <input
           type="range"
           id="epsilon"
@@ -30,13 +40,31 @@
           min="0.1"
           max="1.98"
           value="1"
+          oninput="sliderChange()"
         />
         <p id="epsilonShow">1</p>
       </div>
       <div style="display: flex; justify-content: center; align-items: center">
-        <label for="minPoint">minPoints</label>
-        <input type="range" id="minPoint" step="1" min="1" max="5" value="3" />
-        <p id="minPointShow">3</p>
+        <label
+          for="minPoint"
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+          "
+          >minPoints:
+          <div id="minPointValue"></div
+        ></label>
+        <input
+          type="range"
+          id="minPoint"
+          step="1"
+          min="1"
+          max="5"
+          value="3"
+          oninput="sliderChange()"
+        />
       </div>
     </div>
     <input type="file" accept=".csv,image/*" id="fileUpload" />
