@@ -1,9 +1,16 @@
 class Point {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.screen_x = map(this.x, -10, x_range + 10, 0, width);
-    this.screen_y = map(this.y, -10, y_range + 10, 0, height);
+  constructor(x, y, manual = false) {
+    if (!manual) {
+      this.x = x;
+      this.y = y;
+      this.screen_x = map(this.x, -10, x_range + 10, 0, width);
+      this.screen_y = map(this.y, -10, y_range + 10, 0, height);
+    } else {
+      this.screen_x = x;
+      this.screen_y = y;
+      this.x = map(this.screen_x, 0, width, 0, x_range);
+      this.y = map(this.screen_y, 0, height, 0, y_range);
+    }
     this.serialised = this.x.toString() + "-" + this.y.toString();
   }
 

@@ -13,7 +13,15 @@ let min_points_slider;
 let epsilon;
 let min_points;
 
+let toggle_draw_button;
+let drawing = true;
+
 function setup() {
+  toggle_draw_button = createButton("toggle draw");
+  toggle_draw_button.mousePressed(() => {
+    drawing = !drawing;
+  });
+
   // set default values for epsilon and min_points
   epsilon = document.getElementById("epsilon").value;
   min_points = document.getElementById("minPoint").value;
@@ -87,7 +95,7 @@ function setup() {
                   .set(other_point.serialised, distance);
               }
             }
-            DBSCAN(points, distFunc, epsilon, min_points);
+            // DBSCAN(points, distFunc, epsilon, min_points);
             return;
           }
           // Check image if it is the same
@@ -99,10 +107,11 @@ function setup() {
     });
   frameRate(60);
   epsilon_slider = select("#epsilon");
+  epsilon *= 15;
   epsilon_slider.input(() => {
     epsilon = epsilon_slider.value();
     select("#epsilonShow").html(Number(epsilon).toFixed(2));
-    epsilon*=15
+    epsilon *= 15;
   });
   select("#clear-btn").mousePressed(() => {
     document.getElementById("fileUpload").value = "";
@@ -111,52 +120,66 @@ function setup() {
   min_points_slider = select("#minPoint");
   min_points_slider.input(() => {
     min_points = min_points_slider.value();
-    select("#minPointValue").html(min_points);
+    select("#minPointShow").html(min_points);
   });
 
   select("#start-btn").mousePressed(() => {
-    DBSCAN(points, distFunc, epsilon, min_points);
+    // DBSCAN(points, distFunc, epsilon, min_points);
+    for (let point of points) {
+      distance_cache.set(point.serialised, new Map());
+      for (let other_point of points) {
+        let distance = dist(point.x, point.y, other_point.x, other_point.y);
+        distance_cache
+          .get(point.serialised)
+          .set(other_point.serialised, distance);
+      }
+    }
+    drawing = false;
   });
-  // mousePressed(() => {
-  //   alert("dada");
-  // });
 }
 
 function draw() {
-<<<<<<< HEAD
-  background(0);
-  label = new Map();
-  let cluster_counter = 0;
-  for (let point of points) {
-    if (label.has(point.serialised)) continue;
-    let neighbours = point.getNeighbours(distFunc, epsilon);
-    if (neighbours.length < min_points) {
-      label.set(point.serialised, "noise");
-      continue;
-    }
-    cluster_counter++;
-    label.set(point.serialised, cluster_counter);
-    for (let neighbour of neighbours) {
-      if (label.get(neighbour.serialised) == "noise") {
-        label.set(neighbour.serialised, cluster_counter);
-      }
-      if (label.has(neighbour.serialised)) {
+  if (!drawing) {
+    label = new Map();
+    let cluster_counter = 0;
+    for (let point of points) {
+      if (label.has(point.serialised)) continue;
+      let neighbours = point.getNeighbours(distFunc, epsilon);
+      if (neighbours.length < min_points) {
+        label.set(point.serialised, "noise");
         continue;
       }
-      label.set(neighbour.serialised, cluster_counter);
-      let neighbour_neighbours = neighbour.getNeighbours(distFunc, epsilon);
-      if (neighbour_neighbours.length >= min_points) {
-        for (let i of neighbour_neighbours) {
-          neighbours.push(i);
+      cluster_counter++;
+      label.set(point.serialised, cluster_counter);
+      for (let neighbour of neighbours) {
+        if (label.get(neighbour.serialised) == "noise") {
+          label.set(neighbour.serialised, cluster_counter);
+        }
+        if (label.has(neighbour.serialised)) {
+          continue;
+        }
+        label.set(neighbour.serialised, cluster_counter);
+        let neighbour_neighbours = neighbour.getNeighbours(distFunc, epsilon);
+        if (neighbour_neighbours.length >= min_points) {
+          for (let i of neighbour_neighbours) {
+            neighbours.push(i);
+          }
         }
       }
     }
   }
-=======
   background("#fff");
->>>>>>> 95e9dedfb9330194109c7b945dd0237173413be5
   for (let i = 0; i < points.length; i++) {
     points[i].show();
+  }
+  if (mouseIsPressed && drawing) {
+    push();
+    frameRate(10);
+    let x = mouseX;
+    let y = mouseY;
+    if (x < 0 || x >= width || y < 0 || y >= height) return;
+    points.push(new Point(x, y, true));
+    pop();
   }
 }
 
@@ -170,33 +193,33 @@ const arrRemove = (arr, elt) => {
   arr = arr.filter((gay) => gay.serialised != elt.serialised);
 };
 
-const DBSCAN = async (points, distFunc, epsilon, minPts) => {
-  epsilon *= 15;
-  label = new Map();
-  let cluster_counter = 0;
-  for (let point of points) {
-    if (label.has(point.serialised)) continue;
-    let neighbours = point.getNeighbours(distFunc, epsilon);
-    if (neighbours.length < minPts) {
-      label.set(point.serialised, "noise");
-      continue;
-    }
-    cluster_counter++;
-    label.set(point.serialised, cluster_counter);
-    for (let neighbour of neighbours) {
-      if (label.get(neighbour.serialised) == "noise") {
-        label.set(neighbour.serialised, cluster_counter);
-      }
-      if (label.has(neighbour.serialised)) {
-        continue;
-      }
-      label.set(neighbour.serialised, cluster_counter);
-      let neighbour_neighbours = neighbour.getNeighbours(distFunc, epsilon);
-      if (neighbour_neighbours.length >= minPts) {
-        for (let i of neighbour_neighbours) {
-          neighbours.push(i);
-        }
-      }
-    }
-  }
-};
+// const DBSCAN = async (points, distFunc, epsilon, minPts) => {
+//   epsilon *= 15;
+//   label = new Map();
+//   let cluster_counter = 0;
+//   for (let point of points) {
+//     if (label.has(point.serialised)) continue;
+//     let neighbours = point.getNeighbours(distFunc, epsilon);
+//     if (neighbours.length < minPts) {
+//       label.set(point.serialised, "noise");
+//       continue;
+//     }
+//     cluster_counter++;
+//     label.set(point.serialised, cluster_counter);
+//     for (let neighbour of neighbours) {
+//       if (label.get(neighbour.serialised) == "noise") {
+//         label.set(neighbour.serialised, cluster_counter);
+//       }
+//       if (label.has(neighbour.serialised)) {
+//         continue;
+//       }
+//       label.set(neighbour.serialised, cluster_counter);
+//       let neighbour_neighbours = neighbour.getNeighbours(distFunc, epsilon);
+//       if (neighbour_neighbours.length >= minPts) {
+//         for (let i of neighbour_neighbours) {
+//           neighbours.push(i);
+//         }
+//       }
+//     }
+//   }
+// };
