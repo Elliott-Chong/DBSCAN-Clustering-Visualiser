@@ -93,7 +93,6 @@ function setup() {
           // Check image if it is the same
           // document.getElementById("text-box").value = result;
           const response = await fetch("./private/check.txt");
-
           console.log(await response.json());
         };
       }
