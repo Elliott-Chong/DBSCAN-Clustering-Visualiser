@@ -7,13 +7,27 @@ let label_colors;
 let points = [];
 let distance_cache = new Map();
 
+let epsilon_slider;
+let min_points_slider;
+
+let epsilon;
+let min_points;
+
 function setup() {
+  // set default values for epsilon and min_points
+  epsilon = 20;
+  min_points = 4;
+
   label_colors = {
     1: color(255, 0, 0),
     2: color(0, 255, 0),
     3: color(0, 0, 255),
     4: color(100, 0, 10),
     5: color(50, 30, 100),
+    6: color(100, 40, 255),
+    7: color(93, 255, 10),
+    8: color(0, 100, 255),
+    9: color(100, 30, 20),
   };
   createCanvas(window.innerHeight * 0.95, window.innerHeight * 0.95).parent(
     select("#canvas")
@@ -33,31 +47,76 @@ function setup() {
             .set(other_point.serialised, distance);
         }
       }
-      DBSCAN(points, distFunc, 20, 4);
+      DBSCAN(points, distFunc, epsilon, min_points);
     });
   });
+  // hongyu stuff
+  document
+    .getElementById("fileUpload")
+    .addEventListener("change", async (e) => {
+      document.getElementById(
+        "scatterPoints"
+      ).innerHTML = `<g opacity="0.5" id="clusterRegion"></g>`;
+      if (e.target.files.length < 0) {
+        return;
+      }
+      for (var i of e.target.files) {
+        var fr = new FileReader();
+        fr.readAsText(i);
+        fr.onload = async function () {
+          var result = fr.result.toString(16);
+          // Get data
+          if (i.type.search("text/csv") != -1) {
+            var arr = csvToArray(result);
+            localStorage.setItem("dataset", JSON.stringify(arr));
+            points = [];
+            for (var point of arr) {
+              points.push(new Point(point.x, point.y));
+            }
+            for (let point of points) {
+              distance_cache.set(point.serialised, new Map());
+              for (let other_point of points) {
+                let distance = dist(
+                  point.x,
+                  point.y,
+                  other_point.x,
+                  other_point.y
+                );
+                distance_cache
+                  .get(point.serialised)
+                  .set(other_point.serialised, distance);
+              }
+            }
+            DBSCAN(points, distFunc, 20, 4);
+            return;
+          }
+          // Check image if it is the same
+          // document.getElementById("text-box").value = result;
+          const response = await fetch("./private/check.txt");
+
+          console.log(await response.json());
+        };
+      }
+    });
   frameRate(60);
+  epsilon_slider = select("#epsilon");
+  epsilon_slider.input(() => {
+    epsilon = epsilon_slider.value();
+  });
+
+  min_points_slider = select("#minPoint");
+  min_points_slider.input(() => {
+    min_points = min_points_slider.value();
+  });
+
+  select("#start-btn").mousePressed(() => {
+    console.log("day");
+    DBSCAN(points, distFunc, epsilon, min_points);
+  });
 }
 
 function draw() {
   background(0);
-  // draw axis
-  //   push();
-  //   stroke(100);
-  //   strokeWeight(1);
-  //   line(0, height / 2, width, height / 2);
-  //   line(width / 2, 0, width / 2, height);
-  //   stroke(255);
-  //   textAlign(CENTER);
-  //   // x label
-  //   text(0, 15, height / 2 - 5);
-  //   text(x_range.toString(), width - 15, height / 2 - 5);
-  //   // y label
-  //   text(y_range.toString(), width / 2 + 10, 15);
-  //   text(0, width / 2 + 15, height - 10);
-  //   pop();
-
-  if (points.length == 0) return;
   for (let i = 0; i < points.length; i++) {
     points[i].show();
   }
@@ -74,6 +133,7 @@ const arrRemove = (arr, elt) => {
 };
 
 const DBSCAN = async (points, distFunc, epsilon, minPts) => {
+  label = new Map();
   let cluster_counter = 0;
   for (let point of points) {
     if (label.has(point.serialised)) continue;
