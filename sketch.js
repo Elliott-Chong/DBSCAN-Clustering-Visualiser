@@ -101,13 +101,14 @@ function setup() {
   epsilon_slider = select("#epsilon");
   epsilon_slider.input(() => {
     epsilon = epsilon_slider.value();
-    select("#epsilonShow").html(epsilon);
+    select("#epsilonValue").html(epsilon);
+    epsilon *= 15;
   });
 
   min_points_slider = select("#minPoint");
   min_points_slider.input(() => {
     min_points = min_points_slider.value();
-    select("#minPointShow").html(min_points);
+    select("#minPointValue").html(min_points);
   });
 
   select("#start-btn").mousePressed(() => {
@@ -117,6 +118,33 @@ function setup() {
 
 function draw() {
   background(0);
+  label = new Map();
+  let cluster_counter = 0;
+  for (let point of points) {
+    if (label.has(point.serialised)) continue;
+    let neighbours = point.getNeighbours(distFunc, epsilon);
+    if (neighbours.length < min_points) {
+      label.set(point.serialised, "noise");
+      continue;
+    }
+    cluster_counter++;
+    label.set(point.serialised, cluster_counter);
+    for (let neighbour of neighbours) {
+      if (label.get(neighbour.serialised) == "noise") {
+        label.set(neighbour.serialised, cluster_counter);
+      }
+      if (label.has(neighbour.serialised)) {
+        continue;
+      }
+      label.set(neighbour.serialised, cluster_counter);
+      let neighbour_neighbours = neighbour.getNeighbours(distFunc, epsilon);
+      if (neighbour_neighbours.length >= min_points) {
+        for (let i of neighbour_neighbours) {
+          neighbours.push(i);
+        }
+      }
+    }
+  }
   for (let i = 0; i < points.length; i++) {
     points[i].show();
   }
