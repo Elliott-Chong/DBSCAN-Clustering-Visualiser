@@ -88,7 +88,7 @@ function getRandom(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-function distance(p1, p2) {
+function distFunc(p1, p2) {
   return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
 }
 
@@ -100,10 +100,10 @@ function startDBSCAN() {
   var eps = document.getElementById("epsilon").value;
   var minPoint = document.getElementById("minPoint").value;
   // console.log(JSON.parse(localStorage.getItem("dataset")));
-  var dataset = JSON.parse(localStorage.getItem("dataset"));
+  // var dataset = JSON.parse(localStorage.getItem("dataset"));
   var dotList = [
     ...document.getElementById("scatterPoints").getElementsByClassName("dot"),
-  ];
+  
   var region = [];
   for (var p1 of dotList) {
     var result = [];
@@ -125,4 +125,25 @@ function startDBSCAN() {
   // for (var i of dotList) {
   //   console.log(i);
   // }
+}
+
+function DBSCANNER(DB, distFunc, eps, minPts) {
+  var cluster = 0;
+  for (var point of DB) {
+    var neighbour = RangeQuery(DB, distFunc, point, eps);
+    if (neighbour.length < minPts) {
+      console.log('noise')
+    }
+    cluster++;
+  }
+}
+
+function RangeQuerying(DB, distFunc, Q, eps) {
+  var neighbour = [];
+  for (var i of DB) {
+    if (distFunc(Q, i) <= eps) {
+      neighbour.push(i);
+    }
+  }
+  return neighbour;
 }
