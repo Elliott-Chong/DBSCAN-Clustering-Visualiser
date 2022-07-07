@@ -17,7 +17,8 @@ function setup() {
   // set default values for epsilon and min_points
   epsilon = document.getElementById("epsilon").value;
   min_points = document.getElementById("minPoint").value;
-
+  select("#epsilonShow").html(Number(epsilon).toFixed(2));
+  select("#minPointShow").html(min_points);
   label_colors = {
     1: color(255, 0, 0),
     2: color(0, 255, 0),
@@ -29,9 +30,10 @@ function setup() {
     8: color(0, 100, 255),
     9: color(100, 30, 20),
   };
-  createCanvas(window.innerHeight * 0.95, window.innerHeight * 0.95).parent(
-    select("#canvas")
-  );
+  cnv = createCanvas(
+    window.innerHeight * 0.85,
+    window.innerHeight * 0.85
+  ).parent(select("#canvas"));
   // remove default csv
   // // fetch csv from server
   // fetch("http://localhost:5000").then((response) => {
@@ -100,9 +102,12 @@ function setup() {
   epsilon_slider = select("#epsilon");
   epsilon_slider.input(() => {
     epsilon = epsilon_slider.value();
-    select("#epsilonShow").html(epsilon);
+    select("#epsilonShow").html(Number(epsilon).toFixed(2));
   });
-
+  select("#clear-btn").mousePressed(() => {
+    document.getElementById("fileUpload").value = "";
+    points = new Array(0);
+  });
   min_points_slider = select("#minPoint");
   min_points_slider.input(() => {
     min_points = min_points_slider.value();
@@ -111,10 +116,6 @@ function setup() {
 
   select("#start-btn").mousePressed(() => {
     DBSCAN(points, distFunc, epsilon, min_points);
-  });
-  select("#clear-btn").mousePressed(() => {
-    select("#fileUpload").value = "";
-    erase();
   });
   // mousePressed(() => {
   //   alert("dada");

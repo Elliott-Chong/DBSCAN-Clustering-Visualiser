@@ -1,14 +1,5 @@
 function onload() {
   localStorage.clear();
-  sliderChange();
-}
-
-function sliderChange() {
-  document.getElementById("epsilonValue").innerHTML = Number(
-    document.getElementById("epsilon").value
-  ).toFixed(2);
-  document.getElementById("minPointValue").innerHTML =
-    document.getElementById("minPoint").value;
 }
 
 function csvToArray(str, delimiter = ",") {

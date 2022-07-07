@@ -9,6 +9,7 @@
     <script src="./p5.min.js" defer></script>
     <script src="./sketch.js" defer></script>
     <script src="./Point.js" defer></script>
+    <link rel="stylesheet" href="index.css" />
   </head>
   <body onload="onload()">
     <div id="canvas"></div>
@@ -31,7 +32,7 @@
             gap: 10px;
           "
           >epsilon:
-          <div id="epsilonValue"></div
+          <div id="epsilonShow"></div
         ></label>
         <input
           type="range"
@@ -40,9 +41,7 @@
           min="0.1"
           max="1.98"
           value="1"
-          oninput="sliderChange()"
         />
-        <p id="epsilonShow">1</p>
       </div>
       <div style="display: flex; justify-content: center; align-items: center">
         <label
@@ -54,17 +53,9 @@
             gap: 10px;
           "
           >minPoints:
-          <div id="minPointValue"></div
+          <div id="minPointShow"></div
         ></label>
-        <input
-          type="range"
-          id="minPoint"
-          step="1"
-          min="1"
-          max="5"
-          value="3"
-          oninput="sliderChange()"
-        />
+        <input type="range" id="minPoint" step="1" min="1" max="5" value="3" />
       </div>
       <button id="clear-btn">Clear Canvas</button>
     </div>
