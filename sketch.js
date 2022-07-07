@@ -17,7 +17,7 @@ function setup() {
   // set default values for epsilon and min_points
   epsilon = document.getElementById("epsilon").value;
   min_points = document.getElementById("minPoint").value;
-  
+
   label_colors = {
     1: color(255, 0, 0),
     2: color(0, 255, 0),
@@ -112,6 +112,13 @@ function setup() {
   select("#start-btn").mousePressed(() => {
     DBSCAN(points, distFunc, epsilon, min_points);
   });
+  select("#clear-btn").mousePressed(() => {
+    select("#fileUpload").value = "";
+    erase();
+  });
+  // mousePressed(() => {
+  //   alert("dada");
+  // });
 }
 
 function draw() {
