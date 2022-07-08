@@ -140,8 +140,8 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function DBSCANNER(DB, distanceFunc, eps, minPts) {
   eps *= 22.5;
   let cluster = 0;
-  let all = []
-  let vis = []
+  let all = [];
+  let vis = [];
   for (let [idx, point] of DB.entries()) {
     var pointClass = [...point.classList];
     pointClass.splice(pointClass.indexOf("dot"), 1);
@@ -157,14 +157,14 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
     point.classList.add(`C${cluster}`);
     let seedSet = [...neighbour];
     if (!vis[idx]) {
-      all.push(point)
+      all.push(point);
       vis[idx] = 1;
     }
     // seedSet.splice(seedSet.indexOf(point), 1);
     for (let [i, seedPoint] of seedSet) {
       if (!vis[i]) {
         vis[i] = 1;
-        all.push(seedPoint)
+        all.push(seedPoint);
       }
       if (seedPoint.classList.contains("noise")) {
         seedPoint.classList.add(`NC${cluster}`);
@@ -214,7 +214,6 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
               }; stroke-width: 2; fill:transparent;"
               id="ring${ringID}"
             ></circle>`;
-
     setTimeout(() => {
       document.getElementById(`ring${ringID}`).remove();
       if (!noise) {
@@ -224,6 +223,32 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
       if (noiseCluster) {
         points.style.fill = COLOR[match % COLOR.length];
       }
+    }, 100);
+    await sleep(50);
+  }
+  var remaining = [];
+  DB.filter((element) => {
+    if (!all.includes(element)) {
+      remaining.push(element);
+    }
+  });
+  for await (var point of remaining) {
+    const points = point;
+    const x = point.cx.baseVal.value;
+    const y = point.cy.baseVal.value;
+    const ringID = remaining.indexOf(point);
+    document.getElementById("ringRegion").innerHTML += `
+              <circle
+              class="eps_ball"
+              cx="${x}"
+              cy="${y}"
+              r="${eps}"
+              opacity="1"
+              style="stroke: black; stroke-width: 2; fill:transparent;"
+              id="ring${ringID}"
+            ></circle>`;
+    setTimeout(() => {
+      document.getElementById(`ring${ringID}`).remove();
     }, 100);
     await sleep(50);
   }
