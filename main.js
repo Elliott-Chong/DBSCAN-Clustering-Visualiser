@@ -115,10 +115,21 @@ async function startDBSCAN() {
     return;
   }
   if (document.getElementById("svgCanvas").classList.contains("scan")) {
+    document.getElementById("svgCanvas").classList.remove("scan");
+    document.getElementById("minPoint").disabled = false;
+    document.getElementById("toggleDraw").disabled = false;
+    document.getElementById("epsilon").disabled = false;
+    document.getElementById("fileUpload").disabled = false;
+    document.getElementById("start-btn").innerHTML = "START";
     return;
   }
+  document.getElementById("start-btn").innerHTML = "FINISH";
   document.getElementById("svgCanvas").classList.add("scan");
   document.getElementById("svgCanvas").classList.remove("drawable");
+  document.getElementById("minPoint").disabled = true;
+  document.getElementById("toggleDraw").disabled = true;
+  document.getElementById("epsilon").disabled = true;
+  document.getElementById("fileUpload").disabled = true;
   document.getElementById("toggleDraw").checked = false;
   document.getElementById("clusterRegion").innerHTML = "";
   for (var i of document.getElementsByClassName("dot")) {
@@ -133,6 +144,11 @@ async function startDBSCAN() {
   ];
   await DBSCANNER(dotList, distanceFunc, eps, minPoint);
   document.getElementById("svgCanvas").classList.remove("scan");
+  document.getElementById("minPoint").disabled = false;
+  document.getElementById("toggleDraw").disabled = false;
+  document.getElementById("epsilon").disabled = false;
+  document.getElementById("fileUpload").disabled = false;
+  document.getElementById("start-btn").innerHTML = "START";
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -143,6 +159,9 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
   let all = [];
   let vis = [];
   for (let [idx, point] of DB.entries()) {
+    if (!document.getElementById("svgCanvas").classList.contains("scan")) {
+      return;
+    }
     var pointClass = [...point.classList];
     pointClass.splice(pointClass.indexOf("dot"), 1);
     if (pointClass.length != 0) {
@@ -162,6 +181,9 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
     }
     // seedSet.splice(seedSet.indexOf(point), 1);
     for (let [i, seedPoint] of seedSet) {
+      if (!document.getElementById("svgCanvas").classList.contains("scan")) {
+        return;
+      }
       if (!vis[i]) {
         vis[i] = 1;
         all.push(seedPoint);
@@ -181,7 +203,13 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
       }
     }
   }
+  var ringSpeed = 100;
+  var fillSpeed = 50;
   for await (var point of all) {
+    if (!document.getElementById("svgCanvas").classList.contains("scan")) {
+      var ringSpeed = 0;
+      var fillSpeed = 0;
+    }
     var classList = [...point.classList];
     let match = classList.find((e) => {
       return e.includes("C");
@@ -223,8 +251,8 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
       if (noiseCluster) {
         points.style.fill = COLOR[match % COLOR.length];
       }
-    }, 100);
-    await sleep(50);
+    }, ringSpeed);
+    await sleep(fillSpeed);
   }
   var remaining = [];
   DB.filter((element) => {
@@ -233,7 +261,10 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
     }
   });
   for await (var point of remaining) {
-    const points = point;
+    if (!document.getElementById("svgCanvas").classList.contains("scan")) {
+      var ringSpeed = 0;
+      var fillSpeed = 0;
+    }
     const x = point.cx.baseVal.value;
     const y = point.cy.baseVal.value;
     const ringID = remaining.indexOf(point);
@@ -249,8 +280,8 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
             ></circle>`;
     setTimeout(() => {
       document.getElementById(`ring${ringID}`).remove();
-    }, 100);
-    await sleep(50);
+    }, ringSpeed);
+    await sleep(fillSpeed);
   }
 }
 
@@ -293,7 +324,8 @@ document
       // Mouse position
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      document.getElementById("scatterPoints").innerHTML += `
+      if (document.getElementById("remove").checked) {
+        document.getElementById("scatterPoints").innerHTML += `
         <circle
             class="dot"
             r="3.5"
@@ -302,10 +334,12 @@ document
             style="fill: white; stroke: black; stroke-width: 1px"
           ></circle>
         `;
+      }
     } else {
       const x = e.srcElement.cx.baseVal.value;
       const y = e.srcElement.cy.baseVal.value;
-      document.getElementById("scatterPoints").innerHTML += `
+      if (document.getElementById("remove").checked) {
+        document.getElementById("scatterPoints").innerHTML += `
         <circle
             class="dot"
             r="3.5"
@@ -314,6 +348,20 @@ document
             style="fill: white; stroke: black; stroke-width: 1px"
           ></circle>
         `;
+      } else {
+        var dotArray = [
+          ...document.getElementById("scatterPoints").querySelectorAll(".dot"),
+        ];
+        for (var i = 0; i < dotArray.length; i++) {
+          if (
+            dotArray[i].cx.baseVal.value == x &&
+            dotArray[i].cy.baseVal.value == y
+          ) {
+            dotArray[i].remove();
+            break;
+          }
+        }
+      }
     }
   });
 
@@ -344,6 +392,10 @@ document.getElementById("saveData").addEventListener("click", () => {
   download("DBSCANData.csv", output);
 });
 document.getElementById("clearData").addEventListener("click", () => {
+  if (document.getElementById("svgCanvas").classList.contains("scan")) {
+    return;
+  }
+  document.getElementById("fileUpload").value = "";
   document.getElementById("svgCanvas").classList.add("drawable");
   document.getElementById("toggleDraw").checked = true;
   document.getElementById(
@@ -367,3 +419,11 @@ function download(filename, text) {
     pom.click();
   }
 }
+
+document.getElementById("remove").addEventListener("input", () => {
+  if (document.getElementById("remove").checked) {
+    document.querySelector('label[for="remove"]').innerHTML = `Add`;
+  } else {
+    document.querySelector('label[for="remove"]').innerHTML = `Remove`;
+  }
+});

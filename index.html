@@ -10,71 +10,18 @@
     <script src="./sketch.js" defer></script>
     <script src="./Point.js" defer></script> -->
     <link rel="stylesheet" href="index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+      integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn"
+      crossorigin="anonymous"
+    />
   </head>
   <body onload="onload()">
-    <div id="canvas"></div>
-    <div
-      style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-      "
-    >
-      <button id="start-btn" onclick="startDBSCAN()">START</button>
-      <div style="display: flex; justify-content: center; align-items: center">
-        <label
-          for="epsilon"
-          style="
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-          "
-          >epsilon:
-          <div id="epsilonValue"></div
-        ></label>
-        <input
-          type="range"
-          id="epsilon"
-          step="0.02"
-          min="0.2"
-          max="1.98"
-          value="1"
-          oninput="sliderChange()"
-        />
-      </div>
-      <div style="display: flex; justify-content: center; align-items: center">
-        <label
-          for="minPoint"
-          style="
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-          "
-          >minPoints:
-          <div id="minPointValue" style="width: 16px"></div
-        ></label>
-        <input
-          type="range"
-          id="minPoint"
-          step="1"
-          min="1"
-          max="15"
-          value="3"
-          oninput="sliderChange()"
-        />
-      </div>
-      <input type="checkbox" checked="true" id="toggleDraw" />
-      <button id="clearData">Clear Data</button>
-      <button id="saveData">Save Data</button>
-    </div>
-    <input type="file" accept=".csv,image/*" id="fileUpload" />
-    <p id="test"></p>
     <div
       id="svgContainer"
-      style="width: 75vw; aspect-ratio: 16/9; margin: 0 auto"
+      style="aspect-ratio: 16/8; margin: 0 auto"
+      class="container"
     >
       <svg
         width="100%"
@@ -90,6 +37,116 @@
           <g opacity="0.5" id="clusterRegion"></g>
         </g>
       </svg>
+    </div>
+    <div id="panel" class="container">
+      <div
+        class="row justify-content-center align-items-center p-3"
+        style="gap: 10px"
+      >
+        <div class="col-12 col-md-4 col-lg-3 text-center">
+          <input type="file" accept=".csv,image/*" id="fileUpload" />
+        </div>
+        <div
+          class="col-12 col-md-4 col-lg-1 text-center d-flex flex-column justify-content-center align-items-center"
+          style="gap: 10px"
+        >
+          <button
+            id="start-btn"
+            class="btn btn-primary"
+            onclick="startDBSCAN()"
+          >
+            START
+          </button>
+          <div class="custom-control custom-switch">
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              checked="true"
+              id="toggleDraw"
+            />
+            <label class="custom-control-label" for="toggleDraw">Drawing</label>
+          </div>
+          <div class="custom-control custom-switch">
+            <input
+              type="checkbox"
+              class="custom-control-input"
+              checked="true"
+              id="remove"
+            />
+            <label class="custom-control-label" for="remove">Add</label>
+          </div>
+        </div>
+        <div
+          class="col-12 col-md-4 col-lg-2 text-center d-flex flex-column justify-content-center align-items-center"
+          style="gap: 10px"
+        >
+          <button id="clearData" class="btn btn-primary">Clear Data</button>
+          <button id="saveData" class="btn btn-primary">Save Data</button>
+        </div>
+        <div
+          style="gap: 10px"
+          class="col-12 col-md-4 col-lg-2 text-center d-flex flex-column justify-content-center align-items-center"
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 5px;
+            "
+          >
+            <label
+              for="epsilon"
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+              "
+              >epsilon:
+              <div id="epsilonValue"></div
+            ></label>
+            <input
+              type="range"
+              id="epsilon"
+              step="0.02"
+              min="0.2"
+              max="1.98"
+              value="1"
+              oninput="sliderChange()"
+            />
+          </div>
+          <div
+            style="
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 5px;
+            "
+          >
+            <label
+              for="minPoint"
+              style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+              "
+              >minPoints:
+              <div id="minPointValue" style="width: 16px"></div
+            ></label>
+            <input
+              type="range"
+              id="minPoint"
+              step="1"
+              min="1"
+              max="15"
+              value="3"
+              oninput="sliderChange()"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   </body>
 </html>
