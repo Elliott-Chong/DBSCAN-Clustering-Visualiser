@@ -1,3 +1,16 @@
+const COLOR = [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "black",
+  "purple",
+  "lightslategray",
+  "brown",
+  "orange",
+  "pink",
+];
+
 function onload() {
   localStorage.clear();
   sliderChange();
@@ -16,7 +29,7 @@ document.getElementById("fileUpload").addEventListener("change", async (e) => {
   document.getElementById("toggleDraw").checked = false;
   document.getElementById(
     "scatterPoints"
-  ).innerHTML = `<g opacity="0.5" id="clusterRegion"></g>`;
+  ).innerHTML = `<g id="ringRegion"></g><g opacity="0.5" id="clusterRegion"></g>`;
   if (e.target.files.length < 0) {
     return;
   }
@@ -98,12 +111,12 @@ function distanceFunc(p1, p2) {
 }
 
 function startDBSCAN() {
-  document.getElementById("svgCanvas").classList.remove("drawable");
-  document.getElementById("toggleDraw").checked = false;
-  if (document.getElementById("scatterPoints").children.length <= 1) {
+  if (document.querySelectorAll(".dot").length <= 0) {
     alert("no data points found");
     return;
   }
+  document.getElementById("svgCanvas").classList.remove("drawable");
+  document.getElementById("toggleDraw").checked = false;
   var eps = document.getElementById("epsilon").value;
   var minPoint = document.getElementById("minPoint").value;
   var dotList = [
@@ -145,13 +158,14 @@ function DBSCANNER(DB, distanceFunc, eps, minPts) {
       continue;
     }
     cluster++;
-    point.classList.add(`C`);
     point.classList.add(`C${cluster}`);
+    point.style.fill = COLOR[(cluster % COLOR.length) - 1];
     let seedSet = [...neighbour];
     seedSet.splice(seedSet.indexOf(point), 1);
     for (let seedPoint of seedSet) {
       if (seedPoint.classList.contains("noise")) {
         seedPoint.classList.add(`NC${cluster}`);
+        seedPoint.style.fill = COLOR[(cluster % COLOR.length) - 1];
       }
       var seedClass = [...seedPoint.classList];
       seedClass.splice(seedClass.indexOf("dot"), 1);
@@ -159,7 +173,7 @@ function DBSCANNER(DB, distanceFunc, eps, minPts) {
         continue;
       }
       seedPoint.classList.add(`C${cluster}`);
-      seedPoint.classList.add(`C`);
+      seedPoint.style.fill = COLOR[(cluster % COLOR.length) - 1];
       var seedNeighbour = RangeQuery(DB, distanceFunc, seedPoint, eps);
       if (seedNeighbour.length >= minPts) {
         Array.prototype.push.apply(neighbour, seedNeighbour);
@@ -168,12 +182,12 @@ function DBSCANNER(DB, distanceFunc, eps, minPts) {
   }
   for (var i = 1; i <= cluster; i++) {
     for (let points of document.querySelectorAll(`.C${i}`)) {
-      epsilonRing(points.cx.baseVal.value, points.cy.baseVal.value, eps);
+      epsilonRing(points.cx.baseVal.value, points.cy.baseVal.value, eps, i);
     }
   }
 }
 
-function epsilonRing(x, y, eps) {
+function epsilonRing(x, y, eps, cluster) {
   document.getElementById("clusterRegion").innerHTML += `
               <circle
               class="eps_ball"
@@ -181,7 +195,9 @@ function epsilonRing(x, y, eps) {
               cy="${y}"
               r="${eps}"
               opacity="1"
-              style="stroke: red; stroke-width: 2; fill: red"
+              style="stroke: ${
+                COLOR[(cluster % COLOR.length) - 1]
+              }; stroke-width: 2; fill: ${COLOR[(cluster % COLOR.length) - 1]}"
             ></circle>`;
 }
 
@@ -251,10 +267,12 @@ document.getElementById("toggleDraw").addEventListener("input", () => {
 });
 
 document.getElementById("saveData").addEventListener("click", () => {
-  if (document.getElementById("scatterPoints").children.length <= 1) {
+  if (document.querySelectorAll(".dot").length <= 0) {
     alert("no data points found");
     return;
   }
+  document.getElementById("svgCanvas").classList.remove("drawable");
+  document.getElementById("toggleDraw").checked = false;
   var output = "x,y\n";
   for (let point of document.querySelectorAll(".dot")) {
     output += `${point.cx.baseVal.value},${point.cy.baseVal.value}\n`;
@@ -268,21 +286,14 @@ document.getElementById("clearData").addEventListener("click", () => {
   document.getElementById("toggleDraw").checked = true;
   document.getElementById(
     "scatterPoints"
-  ).innerHTML = `<g opacity="0.5" id="clusterRegion"></g>`;
+  ).innerHTML = `<g id="ringRegion"></g><g opacity="0.5" id="clusterRegion"></g>`;
 });
-// function download(text, name, type) {
-//   var a = document.getElementById("a");
-//   var file = new Blob([text], { type: type });
-//   // a.href = URL.createObjectURL(file);
-//   // a.download = name;
-//   return URL.createObjectURL(file);
-// }
 
 function download(filename, text) {
   var pom = document.createElement("a");
   pom.setAttribute(
     "href",
-    "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+    "data:text/csv;charset=utf-8," + encodeURIComponent(text)
   );
   pom.setAttribute("download", filename);
 
