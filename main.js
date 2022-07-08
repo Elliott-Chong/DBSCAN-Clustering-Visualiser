@@ -1,4 +1,5 @@
 const COLOR = [
+  "pink",
   "red",
   "blue",
   "green",
@@ -8,7 +9,6 @@ const COLOR = [
   "lightslategray",
   "brown",
   "orange",
-  "pink",
 ];
 
 function onload() {
@@ -22,6 +22,12 @@ function sliderChange() {
   ).toFixed(2);
   document.getElementById("minPointValue").innerHTML =
     document.getElementById("minPoint").value;
+  document.getElementById("clusterRegion").innerHTML = "";
+  for (var i of document.getElementsByClassName("dot")) {
+    i.removeAttribute("class");
+    i.setAttribute("class", "dot");
+    i.style.fill = "white";
+  }
 }
 
 document.getElementById("fileUpload").addEventListener("change", async (e) => {
@@ -92,13 +98,6 @@ function csvToArray(str, delimiter = ",") {
   return arr;
 }
 
-function selectText() {
-  const input = document.getElementById("text-box");
-  input.focus();
-  input.select();
-  document.execCommand("copy");
-}
-
 function getRandom(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
@@ -159,13 +158,13 @@ function DBSCANNER(DB, distanceFunc, eps, minPts) {
     }
     cluster++;
     point.classList.add(`C${cluster}`);
-    point.style.fill = COLOR[(cluster % COLOR.length) - 1];
+    point.style.fill = COLOR[cluster % COLOR.length];
     let seedSet = [...neighbour];
-    seedSet.splice(seedSet.indexOf(point), 1);
+    // seedSet.splice(seedSet.indexOf(point), 1);
     for (let seedPoint of seedSet) {
       if (seedPoint.classList.contains("noise")) {
         seedPoint.classList.add(`NC${cluster}`);
-        seedPoint.style.fill = COLOR[(cluster % COLOR.length) - 1];
+        seedPoint.style.fill = COLOR[cluster % COLOR.length];
       }
       var seedClass = [...seedPoint.classList];
       seedClass.splice(seedClass.indexOf("dot"), 1);
@@ -173,10 +172,11 @@ function DBSCANNER(DB, distanceFunc, eps, minPts) {
         continue;
       }
       seedPoint.classList.add(`C${cluster}`);
-      seedPoint.style.fill = COLOR[(cluster % COLOR.length) - 1];
+      seedPoint.style.fill = COLOR[cluster % COLOR.length];
       var seedNeighbour = RangeQuery(DB, distanceFunc, seedPoint, eps);
       if (seedNeighbour.length >= minPts) {
-        Array.prototype.push.apply(neighbour, seedNeighbour);
+        seedSet = Array.prototype.push.apply(neighbour, seedNeighbour);
+        console.log(seedSet);
       }
     }
   }
@@ -196,8 +196,8 @@ function epsilonRing(x, y, eps, cluster) {
               r="${eps}"
               opacity="1"
               style="stroke: ${
-                COLOR[(cluster % COLOR.length) - 1]
-              }; stroke-width: 2; fill: ${COLOR[(cluster % COLOR.length) - 1]}"
+                COLOR[cluster % COLOR.length]
+              }; stroke-width: 2; fill: ${COLOR[cluster % COLOR.length]}"
             ></circle>`;
 }
 
@@ -222,11 +222,12 @@ document
     const target = e.target;
     // Get the bounding rectangle of target
     const rect = target.getBoundingClientRect();
-    document.getElementById("clusterRegion").innerHTML = "";
-    for (var i of document.getElementsByClassName("dot")) {
-      i.removeAttribute("class");
-      i.setAttribute("class", "dot");
-    }
+    // document.getElementById("clusterRegion").innerHTML = "";
+    // for (var i of document.getElementsByClassName("dot")) {
+    //   i.removeAttribute("class");
+    //   i.setAttribute("class", "dot");
+    //   i.style.fill = "white";
+    // }
     if (target.tagName == "rect") {
       // Mouse position
       const x = e.clientX - rect.left;
@@ -262,6 +263,7 @@ document.getElementById("toggleDraw").addEventListener("input", () => {
     for (var i of document.getElementsByClassName("dot")) {
       i.removeAttribute("class");
       i.setAttribute("class", "dot");
+      i.style.fill = "white";
     }
   }
 });
