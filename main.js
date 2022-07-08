@@ -133,24 +133,6 @@ async function startDBSCAN() {
   ];
   await DBSCANNER(dotList, distanceFunc, eps, minPoint);
   document.getElementById("svgCanvas").classList.remove("scan");
-  // var region = [];
-  // for (var p1 of dotList) {
-  //   var result = [];
-  //   for (var p2 of dotList.reverse()) {
-  //     if (
-  //       distanceFunc(
-  //         { x: p1.getAttribute("cx"), y: p1.getAttribute("cy") },
-  //         { x: p2.getAttribute("cx"), y: p2.getAttribute("cy") }
-  //       ) < eps
-  //     ) {
-  //       result.push({ x: p2.getAttribute("cx"), y: p2.getAttribute("cy") });
-  //     }
-  //   }
-  //   region.push(result);
-  // }
-  // console.log(region);
-  // var randomPoint = getRandom(dotList);
-  // console.log(randomPoint.getAttribute("cx"), randomPoint.getAttribute("cy"));
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -189,6 +171,9 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
       }
     }
   }
+  DB.forEach((element) => {
+    console.log(element);
+  });
   for await (var point of DB) {
     // console.log(DB);
     var classList = [...point.classList];
@@ -233,8 +218,8 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
       if (noiseCluster) {
         points.style.fill = COLOR[match % COLOR.length];
       }
-    }, 200);
-    await sleep(200);
+    }, 150);
+    await sleep(150);
   }
 }
 
