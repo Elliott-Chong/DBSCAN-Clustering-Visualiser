@@ -201,3 +201,21 @@ function dbscan_borders() {
     { cluster: 0, x: 2.3, y: -0.5 },
   ]);
 }
+
+const fs = require("fs");
+
+function toCSV(generateFile, n = 0, fileName = "") {
+  var output = "x,y\n";
+  for (let point of generateFile(n)) {
+    output += `${point.x},${point.y}\n`;
+  }
+  console.log(generateFile.name);
+  if (fileName === "") {
+    fileName = generateFile.name;
+  }
+  output = output.slice(0, -1);
+  fs.writeFileSync(fileName + ".csv", output);
+  return;
+}
+
+toCSV(density_bars, 500, "dense");
