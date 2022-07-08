@@ -141,8 +141,9 @@ function startDBSCAN() {
   // var randomPoint = getRandom(dotList);
   // console.log(randomPoint.getAttribute("cx"), randomPoint.getAttribute("cy"));
 }
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function DBSCANNER(DB, distanceFunc, eps, minPts) {
+async function DBSCANNER(DB, distanceFunc, eps, minPts) {
   eps *= 22.5;
   let cluster = 0;
   for (let point of DB) {
@@ -158,13 +159,11 @@ function DBSCANNER(DB, distanceFunc, eps, minPts) {
     }
     cluster++;
     point.classList.add(`C${cluster}`);
-    point.style.fill = COLOR[cluster % COLOR.length];
     let seedSet = [...neighbour];
     // seedSet.splice(seedSet.indexOf(point), 1);
     for (let seedPoint of seedSet) {
       if (seedPoint.classList.contains("noise")) {
         seedPoint.classList.add(`NC${cluster}`);
-        seedPoint.style.fill = COLOR[cluster % COLOR.length];
       }
       var seedClass = [...seedPoint.classList];
       seedClass.splice(seedClass.indexOf("dot"), 1);
@@ -172,17 +171,58 @@ function DBSCANNER(DB, distanceFunc, eps, minPts) {
         continue;
       }
       seedPoint.classList.add(`C${cluster}`);
-      seedPoint.style.fill = COLOR[cluster % COLOR.length];
       var seedNeighbour = RangeQuery(DB, distanceFunc, seedPoint, eps);
       if (seedNeighbour.length >= minPts) {
         Array.prototype.push.apply(seedSet, seedNeighbour);
       }
     }
   }
-  for (var i = 1; i <= cluster; i++) {
-    for (let points of document.querySelectorAll(`.C${i}`)) {
-      epsilonRing(points.cx.baseVal.value, points.cy.baseVal.value, eps, i);
+  for (var point of DB) {
+    // console.log(DB);
+    var classList = [...point.classList];
+    let match = classList.find((e) => {
+      return e.includes("C");
+    });
+    var noise = false;
+    var noiseCluster = false;
+    if (match != undefined) {
+      if (match.includes("N")) {
+        noise = true;
+        noiseCluster = true;
+      }
+      match = parseInt(match.split("C")[1]);
+    } else {
+      noise = true;
+      match = 5;
     }
+    const points = point;
+    const x = point.cx.baseVal.value;
+    const y = point.cy.baseVal.value;
+    const ringID = DB.indexOf(point);
+    document.getElementById("ringRegion").innerHTML += `
+              <circle
+              class="eps_ball"
+              cx="${x}"
+              cy="${y}"
+              r="${eps}"
+              opacity="1"
+              style="stroke: ${
+                COLOR[match % COLOR.length]
+              }; stroke-width: 2; fill:transparent;"
+              id="ring${ringID}"
+            ></circle>`;
+
+    setTimeout(() => {
+      document.getElementById(`ring${ringID}`).remove();
+      if (!noise) {
+        epsilonRing(x, y, eps, match);
+        points.style.fill = COLOR[match % COLOR.length];
+      }
+      if (noiseCluster) {
+        points.style.fill = COLOR[match % COLOR.length];
+      }
+    }, 200);
+    await sleep(150);
   }
 }
 
