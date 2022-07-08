@@ -137,6 +137,7 @@ const DBSCAN = async (points, distFunc, epsilon, minPts) => {
   label = new Map();
   let cluster_counter = 0;
   for (let point of points) {
+    console.log(point.serialised);
     if (label.has(point.serialised)) continue;
     let neighbours = point.getNeighbours(distFunc, epsilon);
     if (neighbours.length < minPts) {

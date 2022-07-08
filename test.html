@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" />
+  </head>
+  <body>
+    <input type="file" accept=".csv,image/*" id="fileUpload" />
+    <div id="div" style="width: 75vw; aspect-ratio: 16/9">
+      <svg width="100%" height="100%" preserveAspectRatio="none" id="svgCanvas">
+        <rect x="0" y="0" width="100%" height="100%" style="fill: pink"></rect>
+        <g id="scatterPoints"></g>
+      </svg>
+    </div>
+    <script>
+      var ele = document.getElementById("div");
+      ele.addEventListener("mousedown", function (e) {
+        // Get the target
+        const target = e.target;
+
+        // Get the bounding rectangle of target
+        const rect = target.getBoundingClientRect();
+
+        if (target.tagName == "rect") {
+          // Mouse position
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          document.getElementById("scatterPoints").innerHTML += `
+        <circle
+            class="dot"
+            r="3.5"
+            cx="${x}"
+            cy="${y}"
+            style="fill: white; stroke: black; stroke-width: 1px"
+          ></circle>
+        `;
+        } else {
+          const x = e.srcElement.cx.baseVal.value;
+          const y = e.srcElement.cy.baseVal.value;
+          document.getElementById("scatterPoints").innerHTML += `
+        <circle
+            class="dot"
+            r="3.5"
+            cx="${x}"
+            cy="${y}"
+            style="fill: white; stroke: black; stroke-width: 1px"
+          ></circle>
+        `;
+        }
+      });
+      document
+        .getElementById("fileUpload")
+        .addEventListener("change", async (e) => {
+          document.getElementById(
+            "scatterPoints"
+          ).innerHTML = `<g opacity="0.5" id="clusterRegion"></g>`;
+          if (e.target.files.length < 0) {
+            return;
+          }
+          for (var i of e.target.files) {
+            var fr = new FileReader();
+            fr.readAsText(i);
+            fr.onload = async function () {
+              var result = fr.result.toString(16);
+              // Get data
+              if (i.type.search("text/csv") != -1) {
+                var arr = csvToArray(result);
+                // localStorage.setItem("dataset", JSON.stringify(arr));
+                for (var points of arr) {
+                  document.getElementById("scatterPoints").innerHTML += `<circle
+            class="dot"
+            r="3.5"
+            cx="${points.x}"
+            cy="${points.y}"
+            style="fill: white; stroke: black; stroke-width: 1px"
+          ></circle>`;
+                }
+                return;
+              }
+              // Check image if it is the same
+              // document.getElementById("text-box").value = result;
+              const response = await fetch("./private/check.txt");
+
+              console.log(await response.json());
+            };
+          }
+        });
+
+      function csvToArray(str, delimiter = ",") {
+        let headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+        const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+        headers = headers
+          .join(",")
+          .replace(/[\n\r]+/g, "")
+          .split(",");
+
+        let arr = rows.map(function (row) {
+          let values = row.split(delimiter);
+          values = values
+            .join(",")
+            .replace(/[\n\r]+/g, "")
+            .split(",");
+          if (values.join(",").length == 0) {
+            return;
+          }
+          const el = headers.reduce(function (object, header, index) {
+            object[header] = Number(values[index]);
+            return object;
+          }, {});
+          return el;
+        });
+        // remove null values
+        arr = arr.filter((n) => {
+          return n;
+        });
+        return arr;
+      }
+    </script>
+  </body>
+</html>

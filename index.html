@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DBSCAN Clustering Visualizer</title>
     <script src="./main.js" defer></script>
-    <script src="./p5.min.js" defer></script>
+    <!-- <script src="./p5.min.js" defer></script>
     <script src="./sketch.js" defer></script>
-    <script src="./Point.js" defer></script>
+    <script src="./Point.js" defer></script> -->
+    <link rel="stylesheet" href="index.css" />
   </head>
   <body onload="onload()">
     <div id="canvas"></div>
@@ -66,15 +67,25 @@
           oninput="sliderChange()"
         />
       </div>
+      <input type="checkbox" checked="true" id="toggleDraw" />
+      <button id="clearData">Clear Data</button>
+      <button id="saveData">Save Data</button>
     </div>
     <input type="file" accept=".csv,image/*" id="fileUpload" />
     <p id="test"></p>
-    <!-- <input type="text" id="text-box" size="20" value="Hello world!" />
-    <button onclick="selectText()">Select text</button> -->
-    <div id="svgContainer" style="width: 75%">
-      <svg width="100%" viewBox="0 0 960 500" preserveAspectRatio="none">
+    <div
+      id="svgContainer"
+      style="width: 75vw; aspect-ratio: 16/9; margin: 0 auto"
+    >
+      <svg
+        width="100%"
+        height="100%"
+        preserveAspectRatio="none"
+        id="svgCanvas"
+        class="drawable"
+      >
         <rect x="0" y="0" width="100%" height="100%" style="fill: pink"></rect>
-        <g id="scatterPoints" transform="translate(50,50) scale(0.95)">
+        <g id="scatterPoints">
           <g opacity="0.5" id="clusterRegion"></g>
         </g>
       </svg>
