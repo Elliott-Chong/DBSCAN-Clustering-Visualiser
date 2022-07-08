@@ -109,19 +109,30 @@ function distanceFunc(p1, p2) {
   );
 }
 
-function startDBSCAN() {
+async function startDBSCAN() {
   if (document.querySelectorAll(".dot").length <= 0) {
     alert("no data points found");
     return;
   }
+  if (document.getElementById("svgCanvas").classList.contains("scan")) {
+    return;
+  }
+  document.getElementById("svgCanvas").classList.add("scan");
   document.getElementById("svgCanvas").classList.remove("drawable");
   document.getElementById("toggleDraw").checked = false;
+  document.getElementById("clusterRegion").innerHTML = "";
+  for (var i of document.getElementsByClassName("dot")) {
+    i.removeAttribute("class");
+    i.setAttribute("class", "dot");
+    i.style.fill = "white";
+  }
   var eps = document.getElementById("epsilon").value;
   var minPoint = document.getElementById("minPoint").value;
   var dotList = [
     ...document.getElementById("scatterPoints").getElementsByClassName("dot"),
   ];
-  DBSCANNER(dotList, distanceFunc, eps, minPoint);
+  await DBSCANNER(dotList, distanceFunc, eps, minPoint);
+  document.getElementById("svgCanvas").classList.remove("scan");
   // var region = [];
   // for (var p1 of dotList) {
   //   var result = [];
@@ -141,6 +152,7 @@ function startDBSCAN() {
   // var randomPoint = getRandom(dotList);
   // console.log(randomPoint.getAttribute("cx"), randomPoint.getAttribute("cy"));
 }
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function DBSCANNER(DB, distanceFunc, eps, minPts) {
@@ -177,7 +189,7 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
       }
     }
   }
-  for (var point of DB) {
+  for await (var point of DB) {
     // console.log(DB);
     var classList = [...point.classList];
     let match = classList.find((e) => {
@@ -222,7 +234,7 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
         points.style.fill = COLOR[match % COLOR.length];
       }
     }, 200);
-    await sleep(150);
+    await sleep(200);
   }
 }
 
@@ -261,12 +273,6 @@ document
     const target = e.target;
     // Get the bounding rectangle of target
     const rect = target.getBoundingClientRect();
-    // document.getElementById("clusterRegion").innerHTML = "";
-    // for (var i of document.getElementsByClassName("dot")) {
-    //   i.removeAttribute("class");
-    //   i.setAttribute("class", "dot");
-    //   i.style.fill = "white";
-    // }
     if (target.tagName == "rect") {
       // Mouse position
       const x = e.clientX - rect.left;
