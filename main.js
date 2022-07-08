@@ -140,7 +140,9 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function DBSCANNER(DB, distanceFunc, eps, minPts) {
   eps *= 22.5;
   let cluster = 0;
-  for (let point of DB) {
+  let all = []
+  let vis = []
+  for (let [idx, point] of DB.entries()) {
     var pointClass = [...point.classList];
     pointClass.splice(pointClass.indexOf("dot"), 1);
     if (pointClass.length != 0) {
@@ -154,8 +156,16 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
     cluster++;
     point.classList.add(`C${cluster}`);
     let seedSet = [...neighbour];
+    if (!vis[idx]) {
+      all.push(point)
+      vis[idx] = 1;
+    }
     // seedSet.splice(seedSet.indexOf(point), 1);
-    for (let seedPoint of seedSet) {
+    for (let [i, seedPoint] of seedSet) {
+      if (!vis[i]) {
+        vis[i] = 1;
+        all.push(seedPoint)
+      }
       if (seedPoint.classList.contains("noise")) {
         seedPoint.classList.add(`NC${cluster}`);
       }
@@ -171,7 +181,8 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
       }
     }
   }
-  for await (var point of DB) {
+  console.log(all.length)
+  for await (var point of all) {
     // console.log(DB);
     var classList = [...point.classList];
     let match = classList.find((e) => {
@@ -215,8 +226,8 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
       if (noiseCluster) {
         points.style.fill = COLOR[match % COLOR.length];
       }
-    }, 150);
-    await sleep(150);
+    }, 200);
+    await sleep(20);
   }
 }
 
@@ -236,9 +247,9 @@ function epsilonRing(x, y, eps, cluster) {
 
 function RangeQuery(DB, distanceFunc, Q, eps) {
   var neighbour = [];
-  for (var i of DB) {
-    if (distanceFunc(Q, i) <= eps) {
-      neighbour.push(i);
+  for (var [i, val] of DB.entries()) {
+    if (distanceFunc(Q, val) <= eps) {
+      neighbour.push([i, val]);
     }
   }
   return neighbour;

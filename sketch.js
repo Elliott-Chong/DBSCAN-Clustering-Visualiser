@@ -117,6 +117,7 @@ function setup() {
 
 function draw() {
   background(0);
+  console.log("drawing");
   for (let i = 0; i < points.length; i++) {
     points[i].show();
   }
