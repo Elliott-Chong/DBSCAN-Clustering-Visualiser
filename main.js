@@ -175,8 +175,7 @@ function DBSCANNER(DB, distanceFunc, eps, minPts) {
       seedPoint.style.fill = COLOR[cluster % COLOR.length];
       var seedNeighbour = RangeQuery(DB, distanceFunc, seedPoint, eps);
       if (seedNeighbour.length >= minPts) {
-        seedSet = Array.prototype.push.apply(neighbour, seedNeighbour);
-        console.log(seedSet);
+        Array.prototype.push.apply(seedSet, seedNeighbour);
       }
     }
   }
