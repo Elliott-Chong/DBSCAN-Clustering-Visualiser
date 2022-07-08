@@ -171,9 +171,6 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
       }
     }
   }
-  DB.forEach((element) => {
-    console.log(element);
-  });
   for await (var point of DB) {
     // console.log(DB);
     var classList = [...point.classList];
