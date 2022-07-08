@@ -63,7 +63,7 @@ document.getElementById("fileUpload").addEventListener("change", async (e) => {
       // document.getElementById("text-box").value = result;
       const response = await fetch("./private/check.txt");
 
-      console.log(await response.json());
+      // console.log(await response.json());
     };
   }
 });
@@ -181,9 +181,7 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
       }
     }
   }
-  console.log(all.length)
   for await (var point of all) {
-    // console.log(DB);
     var classList = [...point.classList];
     let match = classList.find((e) => {
       return e.includes("C");
@@ -226,8 +224,8 @@ async function DBSCANNER(DB, distanceFunc, eps, minPts) {
       if (noiseCluster) {
         points.style.fill = COLOR[match % COLOR.length];
       }
-    }, 200);
-    await sleep(20);
+    }, 100);
+    await sleep(50);
   }
 }
 
@@ -318,7 +316,6 @@ document.getElementById("saveData").addEventListener("click", () => {
     output += `${point.cx.baseVal.value},${point.cy.baseVal.value}\n`;
   }
   output = output.slice(0, -1);
-  console.log(output);
   download("DBSCANData.csv", output);
 });
 document.getElementById("clearData").addEventListener("click", () => {
